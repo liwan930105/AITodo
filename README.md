@@ -10,14 +10,28 @@ This project now includes Next.js API Routes backed by Supabase:
 - `PATCH /api/tasks/[id]`: Update task status.
 - `DELETE /api/tasks/[id]`: Delete a task.
 
+## Database setup
+
+Run `sql/task.sql` in the Supabase SQL Editor to create the `tasks` table and RLS policies.
+
 ## Environment variables
 
-Create a `.env.local` file:
+Copy `.env.example` to `.env.local` and fill in your Supabase credentials:
+
+```bash
+cp .env.example .env.local
+```
 
 ```bash
 SUPABASE_URL=https://your-project-ref.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
+
+Notes:
+
+- `SUPABASE_URL` must be the project base URL (no `/rest/v1/` suffix).
+- `SUPABASE_SERVICE_ROLE_KEY` is the **service_role** secret from Supabase Dashboard → Settings → API.
+- Do not use the `publishable` key here. If you only have a publishable key, run the RLS policies in `sql/task.sql` and expect permission errors until policies are applied.
 
 ## Run
 
@@ -25,3 +39,5 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 npm install
 npm run dev
 ```
+
+Open [http://localhost:3000](http://localhost:3000) for the Todo UI.

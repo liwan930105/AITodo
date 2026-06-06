@@ -19,3 +19,22 @@ CREATE INDEX idx_tasks_created_at ON tasks (created_at DESC);
 -- 注释（可选）
 COMMENT ON TABLE tasks IS '待办事项表';
 COMMENT ON COLUMN tasks.parent_id IS '父任务 ID，用于关联 AI 拆解的子任务';
+
+-- 行级安全策略（使用 anon / publishable key 时需要；service_role key 会绕过 RLS）
+ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "tasks_select_all"
+  ON tasks FOR SELECT
+  USING (true);
+
+CREATE POLICY "tasks_insert_all"
+  ON tasks FOR INSERT
+  WITH CHECK (true);
+
+CREATE POLICY "tasks_update_all"
+  ON tasks FOR UPDATE
+  USING (true);
+
+CREATE POLICY "tasks_delete_all"
+  ON tasks FOR DELETE
+  USING (true);

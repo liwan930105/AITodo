@@ -29,6 +29,12 @@ const mapSupabaseError = (error: PostgrestError): { statusCode: number; message:
       return { statusCode: 400, message: "Invalid parentId: parent task does not exist." };
     case "22P02":
       return { statusCode: 400, message: "Invalid input format." };
+    case "42501":
+      return {
+        statusCode: 403,
+        message:
+          "Database permission denied. Use SUPABASE_SERVICE_ROLE_KEY or apply RLS policies from sql/task.sql."
+      };
     default:
       return { statusCode: 500, message: "Database operation failed." };
   }
