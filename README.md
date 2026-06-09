@@ -1,5 +1,5 @@
 # AITodo
-AI TodoList
+这是一个通过cursor编码实现的清单待办事项项目
 
 ## API Routes
 
@@ -33,6 +33,12 @@ Notes:
 - `SUPABASE_SERVICE_ROLE_KEY` is the **service_role** secret from Supabase Dashboard → Settings → API.
 - Do not use the `publishable` key here. If you only have a publishable key, run the RLS policies in `sql/task.sql` and expect permission errors until policies are applied.
 
+## technology stack
+前端:React+Tailwind CSS(Al写UI)
+后端:Next.jsAPIRoutes(AI写逻辑)
+数据库:Supabase(云端，零配置)
+AI集成:DeepSeek
+
 ## Run
 
 ```bash
@@ -41,3 +47,6 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) for the Todo UI.
+
+## development guide
+https://blog.csdn.net/liwan09/article/details/161830446?spm=1001.2014.3001.5501
