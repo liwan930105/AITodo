@@ -21,6 +21,33 @@ export type UpdateTaskStatusInput = {
   status: TaskStatus;
 };
 
+export type BreakdownTaskInput = {
+  taskId: string;
+  title: string;
+};
+
+export const validateBreakdownTaskInput = (body: unknown): BreakdownTaskInput | null => {
+  if (!isPlainObject(body)) {
+    return null;
+  }
+
+  const taskId = body.taskId;
+  const title = body.title;
+
+  if (typeof taskId !== "string" || !isUUID(taskId)) {
+    return null;
+  }
+
+  if (typeof title !== "string" || title.trim().length === 0) {
+    return null;
+  }
+
+  return {
+    taskId,
+    title: title.trim()
+  };
+};
+
 export const isPlainObject = (value: unknown): value is Record<string, unknown> => {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 };
