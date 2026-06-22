@@ -9,6 +9,7 @@ This project now includes Next.js API Routes backed by Supabase:
 - `POST /api/tasks`: Create a task.
 - `PATCH /api/tasks/[id]`: Update task status.
 - `DELETE /api/tasks/[id]`: Delete a task.
+- `POST /api/ai/stream-chat`: Stream AI chat response (SSE).
 
 ## Database setup
 
@@ -25,6 +26,7 @@ cp .env.example .env.local
 ```bash
 SUPABASE_URL=https://your-project-ref.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+SILICONFLOW_API_KEY=your-siliconflow-api-key
 ```
 
 Notes:

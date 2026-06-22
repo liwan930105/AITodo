@@ -2,6 +2,7 @@ import Head from "next/head";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import JournalTabs from "../components/JournalTabs";
 import PromptGenerator from "../components/PromptGenerator";
+import StreamingAiChat from "../components/StreamingAiChat";
 import TaskRow from "../components/TaskRow";
 import { fetchJson } from "../lib/api-client";
 import { buildTaskTree, mergeTasks, removeTaskAndDescendants } from "../lib/task-tree";
@@ -9,7 +10,8 @@ import type { TaskRecord, TaskStatus } from "../lib/task-types";
 
 const TABS = [
   { id: "tasks", label: "待办清单" },
-  { id: "prompts", label: "提示词生成" }
+  { id: "prompts", label: "提示词生成" },
+  { id: "stream-ai", label: "流式AI" }
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -206,8 +208,10 @@ export default function HomePage() {
             )}
           </section>
             </>
-          ) : (
+          ) : activeTab === "prompts" ? (
             <PromptGenerator />
+          ) : (
+            <StreamingAiChat />
           )}
         </div>
       </main>
