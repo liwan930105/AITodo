@@ -5,3 +5,10 @@ node_modules
 *.log
 *.tsbuildinfo
 /.idea/.gitignore
+.vercel
+
+# Tencent Cloud EdgeOne
+.env
+.edgeone/*
+.tef_dist/*
+  
