@@ -1,3 +1,5 @@
+import { buildMetaPrompt } from "./prompt-meta";
+
 const DEEPSEEK_BASE_URL = "https://api.deepseek.com";
 const DEEPSEEK_MODEL = "deepseek-v4-pro";
 
@@ -79,4 +81,49 @@ export const breakdownTaskWithDeepSeek = async (taskTitle: string): Promise<stri
   }
 
   return steps;
+};
+
+export const optimizePromptWithDeepSeek = async (
+  userRequest: string,
+  userInput?: string
+): Promise<string> => {
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  if (!apiKey) {
+    throw new Error("Missing required environment variable: DEEPSEEK_API_KEY");
+  }
+
+  const resolvedInput = userInput && userInput.length > 0 ? userInput : userRequest;
+  const metaPrompt = buildMetaPrompt(userRequest, resolvedInput);
+
+  const response = await fetch(`${DEEPSEEK_BASE_URL}/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: DEEPSEEK_MODEL,
+      messages: [
+        {
+          role: "user",
+          content: metaPrompt
+        }
+      ],
+      temperature: 0.7
+    })
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`DeepSeek API request failed (${response.status}): ${errorText}`);
+  }
+
+  const payload = (await response.json()) as ChatCompletionResponse;
+  const content = payload.choices?.[0]?.message?.content?.trim();
+
+  if (!content) {
+    throw new Error("DeepSeek API returned an empty response.");
+  }
+
+  return content;
 };
