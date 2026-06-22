@@ -80,11 +80,7 @@ const formatCny = (value: number): number => Number(value.toFixed(8));
 
 const encodeTokenLength = (text: string): number => {
   const encoding = getEncoding("o200k_base");
-  try {
-    return encoding.encode(text).length;
-  } finally {
-    encoding.free();
-  }
+  return encoding.encode(text).length;
 };
 
 const countInputTokens = (messages: SiliconFlowChatMessage[]): number => {
@@ -197,11 +193,19 @@ const requestSiliconFlowStream = async (
         }
       },
       shouldRetry: ({ error }) => {
+        if (error instanceof AbortError) {
+          return false;
+        }
+
         const typedError = error as Partial<RetryableHttpError>;
+        if (typeof typedError.status !== "number") {
+          return true;
+        }
+
         return Boolean(
           typedError.status === 429 ||
             typedError.status === 408 ||
-            (typeof typedError.status === "number" && typedError.status >= 500)
+            typedError.status >= 500
         );
       }
     }

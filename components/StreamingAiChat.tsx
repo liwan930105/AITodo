@@ -21,6 +21,31 @@ type DonePayload = {
   usage: ChatUsage;
 };
 
+const isDonePayload = (value: unknown): value is DonePayload => {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const payload = value as { content?: unknown; usage?: unknown };
+  if (typeof payload.content !== "string") {
+    return false;
+  }
+
+  if (typeof payload.usage !== "object" || payload.usage === null) {
+    return false;
+  }
+
+  const usage = payload.usage as Record<string, unknown>;
+  return (
+    typeof usage.inputTokens === "number" &&
+    typeof usage.outputTokens === "number" &&
+    typeof usage.totalTokens === "number" &&
+    typeof usage.inputCostCny === "number" &&
+    typeof usage.outputCostCny === "number" &&
+    typeof usage.totalCostCny === "number"
+  );
+};
+
 const decodeEventBlocks = (buffer: string): { blocks: string[]; rest: string } => {
   const normalized = buffer.replace(/\r\n/g, "\n");
   const blocks: string[] = [];
@@ -166,7 +191,8 @@ export default function StreamingAiChat() {
     const abortController = new AbortController();
     abortControllerRef.current = abortController;
 
-    let donePayload: DonePayload | null = null;
+    let finalAssistantContent = "";
+    let finalUsage: ChatUsage | null = null;
 
     try {
       const response = await fetch("/api/ai/stream-chat", {
@@ -213,13 +239,9 @@ export default function StreamingAiChat() {
         }
 
         if (eventName === "done") {
-          if (
-            typeof payload === "object" &&
-            payload !== null &&
-            "content" in payload &&
-            "usage" in payload
-          ) {
-            donePayload = payload as DonePayload;
+          if (isDonePayload(payload)) {
+            finalAssistantContent = payload.content;
+            finalUsage = payload.usage;
           }
           return;
         }
@@ -233,14 +255,14 @@ export default function StreamingAiChat() {
         }
       });
 
-      const finalText = donePayload?.content ?? draftAssistantRef.current;
+      const finalText = finalAssistantContent || draftAssistantRef.current;
       if (finalText.trim()) {
         setMessages((current) => [...current, { role: "assistant", content: finalText }]);
       }
       setDraftAssistant("");
 
-      if (donePayload?.usage) {
-        setUsage(donePayload.usage);
+      if (finalUsage) {
+        setUsage(finalUsage);
       }
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") {
