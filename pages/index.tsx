@@ -1,9 +1,18 @@
 import Head from "next/head";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import JournalTabs from "../components/JournalTabs";
+import PromptGenerator from "../components/PromptGenerator";
 import TaskRow from "../components/TaskRow";
 import { fetchJson } from "../lib/api-client";
 import { buildTaskTree, mergeTasks, removeTaskAndDescendants } from "../lib/task-tree";
 import type { TaskRecord, TaskStatus } from "../lib/task-types";
+
+const TABS = [
+  { id: "tasks", label: "待办清单" },
+  { id: "prompts", label: "提示词生成" }
+] as const;
+
+type TabId = (typeof TABS)[number]["id"];
 
 type BreakdownResponse = {
   data: {
@@ -14,6 +23,7 @@ type BreakdownResponse = {
 };
 
 export default function HomePage() {
+  const [activeTab, setActiveTab] = useState<TabId>("tasks");
   const [tasks, setTasks] = useState<TaskRecord[]>([]);
   const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(true);
@@ -127,6 +137,14 @@ export default function HomePage() {
 
       <main className="journal-page">
         <div className="journal-notebook">
+          <JournalTabs
+            tabs={[...TABS]}
+            activeTab={activeTab}
+            onChange={(tabId) => setActiveTab(tabId as TabId)}
+          />
+
+          {activeTab === "tasks" ? (
+            <>
           <header className="mb-8">
             <p className="font-handwriting text-base text-ink-light/70">AITodo · 手账本</p>
             <h1 className="font-handwriting mt-1 text-4xl text-ink">我的待办清单</h1>
@@ -187,6 +205,10 @@ export default function HomePage() {
               </ul>
             )}
           </section>
+            </>
+          ) : (
+            <PromptGenerator />
+          )}
         </div>
       </main>
     </>
